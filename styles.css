@@ -1,0 +1,33 @@
+:root{--bg:#ffffff;--fg:#121212;--muted:#5a5a5a;--brand:#3b82f6;--brand-600:#2563eb;--border:#e5e7eb;--surface:#f8fafc}
+*{box-sizing:border-box}
+html,body{padding:0;margin:0}
+body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.5;color:var(--fg);background:var(--bg)}
+.container{max-width:1100px;padding:0 20px;margin:0 auto}
+.narrow{max-width:760px}
+.site-header{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--border);z-index:10}
+.header-inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{font-weight:700}
+.nav{display:flex;gap:16px;align-items:center}
+.nav a{color:var(--fg);text-decoration:none;padding:8px 6px;border-radius:8px}
+.nav a:hover{background:var(--surface)}
+.nav button{padding:8px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;cursor:pointer}
+.hero{padding:72px 0;background:linear-gradient(180deg,rgba(59,130,246,0.06),transparent)}
+.hero h1{font-size:40px;line-height:1.1;margin:0 0 12px}
+.hero p{margin:0 0 24px;color:var(--muted)}
+.cta{display:flex;gap:12px}
+.button{display:inline-block;padding:12px 18px;border-radius:10px;border:1px solid var(--border);text-decoration:none;color:var(--fg);background:var(--bg)}
+.button.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+.button.primary:hover{background:var(--brand-600)}
+.section{padding:56px 0}
+.alt{background:var(--surface)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{padding:20px;border:1px solid var(--border);border-radius:14px;background:var(--bg)}
+.card h3{margin:0 0 8px}
+.contact-form{display:grid;gap:12px}
+.contact-form label{display:grid;gap:6px}
+.contact-form input,.contact-form textarea{padding:10px 12px;border-radius:10px;border:1px solid var(--border);font:inherit}
+.site-footer{border-top:1px solid var(--border);padding:20px 0}
+.footer-inner{display:flex;align-items:center;justify-content:space-between}
+@media (max-width: 800px){.grid{grid-template-columns:1fr}.hero h1{font-size:32px}.header-inner{height:56px}}
+body.dark{--bg:#0b0b0e;--fg:#e5e7eb;--muted:#9ca3af;--brand:#60a5fa;--brand-600:#3b82f6;--border:#1f2937;--surface:#0f172a}
+
