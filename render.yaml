@@ -11,13 +11,8 @@ services:
       - key: NODE_VERSION
         value: 18
       - key: DATA_DIR
-        value: /var/data
+        value: /tmp
       - key: ENCRYPTION_KEY
         generateValue: true
       - key: JWT_SECRET
         generateValue: true
-    disk:
-      name: data
-      mountPath: /var/data
-      sizeGB: 1
-
