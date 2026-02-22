@@ -11,5 +11,4 @@ function ok(res, data) { json(res, 200, data) }
 function bad(res, error) { json(res, 400, { error }) }
 function unauthorized(res) { json(res, 401, { error: 'unauthorized' }) }
 
-export { json, ok, bad, unauthorized }
-
+module.exports = { json, ok, bad, unauthorized }
