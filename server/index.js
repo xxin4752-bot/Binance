@@ -58,8 +58,12 @@ app.post('/api/keys/save', authed, (req, res) => {
 })
 
 app.get('/api/history', authed, (req, res) => {
-  db.all('SELECT ts, nav_usd FROM nav_history WHERE user_id=? ORDER BY ts', [req.uid], (err, rows) => {
-    res.json({ items: rows || [] })
+  db.all('SELECT ts, nav_usd FROM nav_history WHERE user_id=? ORDER BY ts', [req.uid], (err, overall) => {
+    db.all('SELECT ts, exchange, nav_usd FROM nav_history_ex WHERE user_id=? ORDER BY ts', [req.uid], (e2, exRows) => {
+      const exchanges = { binance: [], okx: [] }
+      (exRows||[]).forEach(r=>{ if(r.exchange==='binance') exchanges.binance.push({ts:r.ts, nav_usd:r.nav_usd}); if(r.exchange==='okx') exchanges.okx.push({ts:r.ts, nav_usd:r.nav_usd}) })
+      res.json({ overall: overall||[], exchanges })
+    })
   })
 })
 
@@ -77,6 +81,7 @@ async function computeForUser(uid) {
       let total = 0
       const now = Date.now()
       const pos = []
+      const exTotals = {}
       for (const row of keys) {
         const ex = row.exchange
         const ak = decrypt(row.api_key.toString(), k)
@@ -94,11 +99,15 @@ async function computeForUser(uid) {
             const p = priceMap[b.asset] || 0
             const v = b.amount * p
             total += v
+            exTotals[ex] = (exTotals[ex] || 0) + v
             pos.push([uid, now, ex, b.asset, b.amount, v])
           }
         } catch {}
       }
       db.run('INSERT INTO nav_history(user_id,ts,nav_usd) VALUES(?,?,?)', [uid, now, total])
+      const exStmt = db.prepare('INSERT INTO nav_history_ex(user_id,ts,exchange,nav_usd) VALUES(?,?,?,?)')
+      Object.entries(exTotals).forEach(([ex, v]) => exStmt.run([uid, now, ex, v]))
+      exStmt.finalize()
       if (pos.length) {
         const stmt = db.prepare('INSERT INTO positions(user_id,ts,exchange,asset,amount,value_usd) VALUES(?,?,?,?,?,?)')
         pos.forEach(p => stmt.run(p))
@@ -120,4 +129,3 @@ cron.schedule('*/15 * * * *', () => { computeAll() })
 
 const port = process.env.PORT || 4000
 app.listen(port, () => {})
-

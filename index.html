@@ -9,31 +9,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="./styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
   </head>
   <body>
     <header class="site-header">
       <div class="container header-inner">
         <div class="brand">账户净值仪表盘</div>
         <nav class="nav">
-          <a href="#dashboard">仪表盘</a>
-          <a href="#auth">登录</a>
+          <a href="#auth" id="nav-auth">登录/注册</a>
+          <a href="#dashboard" id="nav-dashboard">仪表盘</a>
           <button id="theme-toggle" aria-label="切换主题">切换主题</button>
         </nav>
       </div>
     </header>
 
     <main>
-      <section class="hero">
-        <div class="container">
-          <h1>聚合 Binance 与 OKX 的净值与持仓</h1>
-          <p>注册并录入交易所 API 后，定时拉取持仓与净值，形成历史曲线。</p>
-          <div class="cta">
-            <a class="button primary" href="#auth">开始使用</a>
-            <a class="button" href="#dashboard">查看仪表盘</a>
-          </div>
-        </div>
-      </section>
-
       <section id="auth" class="section">
         <div class="container grid">
           <div class="card">
@@ -73,12 +63,21 @@
             </form>
           </div>
           <div class="card">
-            <h3>历史净值</h3>
-            <canvas id="navChart" height="120"></canvas>
+            <h3>历史净值（Binance vs OKX）</h3>
+            <canvas id="navChart" height="160"></canvas>
           </div>
           <div class="card">
             <h3>当前持仓</h3>
-            <div id="positions"></div>
+            <div class="grid" style="grid-template-columns:repeat(2,1fr);gap:16px">
+              <div>
+                <h4>Binance</h4>
+                <div id="positions-binance" class="positions"></div>
+              </div>
+              <div>
+                <h4>OKX</h4>
+                <div id="positions-okx" class="positions"></div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
