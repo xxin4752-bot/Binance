@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   if(btn){btn.addEventListener('click',()=>{body.classList.toggle('dark');localStorage.setItem(themeKey,body.classList.contains('dark')?'true':'false')})}
   const year=document.getElementById('year'); if(year){year.textContent=String(new Date().getFullYear())}
 
-  const base=localStorage.getItem('apiBase')||'http://localhost:4000'
+  let base=localStorage.getItem('apiBase')||'http://localhost:4000'
   let token=localStorage.getItem('token')||''
 
   function authHeaders(){return token?{Authorization:`Bearer ${token}`}:{}}
@@ -23,24 +23,44 @@ document.addEventListener('DOMContentLoaded',()=>{
   const reg=document.getElementById('register-form')
   if(reg){reg.addEventListener('submit',async(e)=>{e.preventDefault();
     const f=new FormData(reg);const email=f.get('email');const password=f.get('password');
-    const r=await fetch(base+'/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
-    const j=await r.json(); if(j.token){token=j.token;localStorage.setItem('token',token);setLoggedIn(true);loadAll()}
+    try{
+      const r=await fetch(base+'/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+      const j=await r.json(); if(j.token){token=j.token;localStorage.setItem('token',token);setLoggedIn(true);loadAll()} else {alert('注册失败：'+(j.error||r.status))}
+    }catch(err){alert('无法连接后端：'+(err?.message||err))}
   })}
 
   const login=document.getElementById('login-form')
   if(login){login.addEventListener('submit',async(e)=>{e.preventDefault();
     const f=new FormData(login);const email=f.get('email');const password=f.get('password');
-    const r=await fetch(base+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
-    const j=await r.json(); if(j.token){token=j.token;localStorage.setItem('token',token);setLoggedIn(true);loadAll()}
+    try{
+      const r=await fetch(base+'/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+      const j=await r.json(); if(j.token){token=j.token;localStorage.setItem('token',token);setLoggedIn(true);loadAll()} else {alert('登录失败：'+(j.error||r.status))}
+    }catch(err){alert('无法连接后端：'+(err?.message||err))}
   })}
 
   const keysForm=document.getElementById('keys-form')
   if(keysForm){keysForm.addEventListener('submit',async(e)=>{e.preventDefault();
     const f=new FormData(keysForm)
     const payload={exchange:f.get('exchange'),apiKey:f.get('apiKey'),apiSecret:f.get('apiSecret'),passphrase:f.get('passphrase')||undefined}
-    const r=await fetch(base+'/api/keys/save',{method:'POST',headers:{'Content-Type':'application/json',...authHeaders()},body:JSON.stringify(payload)})
-    const j=await r.json(); if(j.ok){await loadAll()}
+    try{
+      const r=await fetch(base+'/api/keys/save',{method:'POST',headers:{'Content-Type':'application/json',...authHeaders()},body:JSON.stringify(payload)})
+      const j=await r.json(); if(j.ok){await loadAll()} else {alert('保存失败：'+(j.error||r.status))}
+    }catch(err){alert('无法连接后端：'+(err?.message||err))}
   })}
+
+  const baseForm=document.getElementById('base-form')
+  const baseReset=document.getElementById('base-reset')
+  const baseHint=document.getElementById('base-hint')
+  if(baseForm){
+    const input=baseForm.querySelector('input[name="apiBase"]')
+    input.value=base
+    baseForm.addEventListener('submit',(e)=>{e.preventDefault();
+      const f=new FormData(baseForm); base=(f.get('apiBase')||'').toString().replace(/\/$/,'')
+      if(base){ localStorage.setItem('apiBase',base); alert('已保存：'+base) }
+    })
+    if(baseReset){ baseReset.addEventListener('click',()=>{base='http://localhost:4000'; input.value=base; localStorage.setItem('apiBase',base)}) }
+    if(location.protocol==='https:' && (base.startsWith('http://') || base.includes('localhost'))){ baseHint.textContent='你正在 HTTPS 页面访问，如后端为 HTTP 或本机地址，浏览器会拦截请求。请设置为可公开访问的 HTTPS 后端地址。' }
+  }
 
   let chart
   async function loadHistory(){
