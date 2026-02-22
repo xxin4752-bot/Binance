@@ -4,7 +4,8 @@ import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-const dbPath = path.join(__dirname, 'data.sqlite')
+const dataDir = process.env.DATA_DIR || __dirname
+const dbPath = path.join(dataDir, 'data.sqlite')
 
 sqlite3.verbose()
 const db = new sqlite3.Database(dbPath)
